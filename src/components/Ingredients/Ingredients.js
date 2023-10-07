@@ -8,12 +8,30 @@ function Ingredients() {
   const [Ingredients, setIngredients] = useState([]);
 
   const addIngredientsHandler = (value) => {
-    console.log("value", value);
-    setIngredients((prevIng) => {
-      return [...prevIng, { id: Math.random().toString(), ...value }];
-    });
-    console.log(Ingredients);
+    fetch(
+      "https://react-project-5c8fa-default-rtdb.firebaseio.com/ingredients.json",
+      {
+        method: "POST",
+        body: JSON.stringify({ value }),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseData) => {
+        setIngredients((prevIng) => {
+          return [...prevIng, { id: responseData.name, ...value }];
+        });
+      });
   };
+
+  const removeItemHadler = (Itemid) => {
+    setIngredients((pervItems) =>
+      pervItems.filter((item) => item.id !== Itemid)
+    );
+  };
+
   return (
     <div className="App">
       <IngredientForm addIngtrdientsProps={addIngredientsHandler} />
@@ -22,7 +40,7 @@ function Ingredients() {
         <Search />
         <IngredientList
           ingredientsProps={Ingredients}
-          onRemoveItem={() => {}}
+          onRemoveItem={removeItemHadler}
         />
       </section>
     </div>
